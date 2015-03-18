@@ -12,8 +12,7 @@ import (
 )
 
 func init() {
-	logging.VerboseFlag = false
-	logging.SetupLogs()
+	logging.VerboseEnable()
 }
 
 // dig @127.0.0.1 -p 8053 "bob.*.mesos" ANY
