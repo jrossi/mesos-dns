@@ -8,6 +8,7 @@ import (
 	"github.com/mesosphere/mesos-dns/records"
 	"math/rand"
 	"net"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -295,6 +296,7 @@ func (res *Resolver) HandleMesos(w dns.ResponseWriter, r *dns.Msg) {
 	} else if (qType == dns.TypeAAAA) && (len(res.rs.SRVs[dom]) > 0 || len(res.rs.As[dom]) > 0) {
 
 		m = new(dns.Msg)
+		m.Authoritative = true
 		m.SetReply(r)
 		// set NOERROR
 		m.SetRcode(r, 0)
@@ -318,8 +320,8 @@ func (res *Resolver) HandleMesos(w dns.ResponseWriter, r *dns.Msg) {
 			}
 
 			logging.CurLog.MesosNXDomain += 1
-			logging.Verbose.Println("total A rrs:\t" + strconv.Itoa(len(res.rs.As)))
-			logging.Verbose.Println("failed looking for " + r.Question[0].String())
+			logging.VeryVerbose.Println("total A rrs:\t" + strconv.Itoa(len(res.rs.As)))
+			logging.VeryVerbose.Println("failed looking for " + r.Question[0].String())
 		} else {
 			logging.CurLog.MesosSuccess += 1
 		}
@@ -333,6 +335,13 @@ func (res *Resolver) HandleMesos(w dns.ResponseWriter, r *dns.Msg) {
 
 // Serve starts a dns server for net protocol
 func (res *Resolver) Serve(net string) {
+	defer func() {
+		if rec := recover(); rec != nil {
+			logging.Error.Printf("%s\n", rec)
+			os.Exit(1)
+		}
+	}()
+
 	server := &dns.Server{
 		Addr:       res.Config.Listener + ":" + strconv.Itoa(res.Config.Port),
 		Net:        net,
@@ -342,7 +351,11 @@ func (res *Resolver) Serve(net string) {
 	err := server.ListenAndServe()
 	if err != nil {
 		logging.Error.Printf("Failed to setup "+net+" server: %s\n", err.Error())
+	} else {
+		logging.Error.Printf("Not listening/serving any more requests.")
 	}
+
+	os.Exit(1)
 }
 
 // Resolver holds configuration information and the resource records

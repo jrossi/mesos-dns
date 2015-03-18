@@ -7,9 +7,12 @@ import (
 )
 
 var (
-	Info    *log.Logger
-	Verbose *log.Logger
-	Error   *log.Logger
+	Info        *log.Logger
+	Verbose     *log.Logger
+	VeryVerbose *log.Logger
+	Error       *log.Logger
+	logopts     int
+	CurLog      LogOut
 )
 
 type LogOut struct {
@@ -24,19 +27,25 @@ type LogOut struct {
 	NonMesosRecursed int
 }
 
-var CurLog LogOut
-
 // PrintCurLog prints out the current LogOut and then resets
 func PrintCurLog() {
-	Verbose.Printf("%+v\n", CurLog)
+	VeryVerbose.Printf("%+v\n", CurLog)
 }
 
 func init() {
-	Info = log.New(os.Stdout, "INFO: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Verbose = log.New(ioutil.Discard, "VERBOSE: ", log.Ldate|log.Ltime|log.Lshortfile)
-	Error = log.New(os.Stderr, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+	logopts := log.Ldate | log.Ltime | log.Lshortfile
+
+	Info = log.New(os.Stdout, "INFO: ", logopts)
+	Verbose = log.New(ioutil.Discard, "VERBOSE: ", logopts)
+	VeryVerbose = log.New(ioutil.Discard, "VERY VERBOSE: ", logopts)
+	Error = log.New(os.Stderr, "ERROR: ", logopts)
 }
 
 func VerboseEnable() {
-	Verbose = log.New(os.Stdout, "VERBOSE: ", log.Ldate|log.Ltime|log.Lshortfile)
+	Verbose = log.New(os.Stdout, "VERBOSE: ", logopts)
+}
+
+func VeryVerboseEnable() {
+	VerboseEnable()
+	VeryVerbose = log.New(os.Stdout, "VERY VERBOSE: ", logopts)
 }

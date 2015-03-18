@@ -56,18 +56,22 @@ type Config struct {
 	Listener string
 
 	// Verbose is the logging level
-	Verbose bool
+	Verbose     bool
+	VeryVerbose bool
 }
 
 func Flags(prefix string) []cli.Flag {
 	evname := func(n string) string {
 		return fmt.Sprintf("%s_%s", strings.ToUpper(prefix), strings.ToUpper(n))
 	}
-	defaults := New()
 	return []cli.Flag{
 		cli.BoolFlag{
 			Name:   "V, verbose",
 			EnvVar: evname("VERBOSE"),
+		},
+		cli.BoolFlag{
+			Name:   "VV, veryverbose",
+			EnvVar: evname("VERYVERBOSE"),
 		},
 		cli.StringFlag{
 			Name:   "j, jsonconfig",

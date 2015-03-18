@@ -45,7 +45,9 @@ func main() {
 			os.Exit(1)
 		}
 
-		if conf.Verbose {
+		if conf.VeryVerbose {
+			logging.VeryVerboseEnable()
+		} else if conf.Verbose {
 			logging.VerboseEnable()
 		}
 		logging.Verbose.Println("Mesos-DNS configuration:")
