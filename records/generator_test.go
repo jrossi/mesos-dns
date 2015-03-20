@@ -8,8 +8,7 @@ import (
 )
 
 func init() {
-	logging.VerboseFlag = false
-	logging.SetupLogs()
+	logging.VerboseEnable()
 }
 
 func TestHostBySlaveId(t *testing.T) {
